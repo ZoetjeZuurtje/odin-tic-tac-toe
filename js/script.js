@@ -1,26 +1,27 @@
 const GameBoard = (function () {
     const SIZE = 3;
     let board = [];
-    const reset = function () {
+    const reset = () => {
         board = [];
         for (let row = 0; row < SIZE; row++) {
             board.push(new Array(SIZE));
         }
     }
-    const putAt = function (row, col, symbol) {
+    const putAt = (row, col, symbol) => {
         if (board[row][col] == undefined) {
             board[row][col] = symbol;
             return true;
         }
         return false;
     }
-    const getBoard = function () {
+    const getBoard = () => {
         return board;
     }
     // Returns false if the game is still ongoing, to prevent accidental draws from occurring
-    const checkWin = function () {
+    const checkWin = () => {
         // If not, check to see who won (if anyone)
         let eval = false;
+        // Rows
         for (let i = 0; i < SIZE; i++) {
             if (board[i][0] == board[i][1] &&
                 board[i][0] == board[i][2] &&
@@ -28,6 +29,7 @@ const GameBoard = (function () {
                 eval = board[i][0];
             };
         }
+        // Columns
         for (let i = 0; i < SIZE; i++) {
             if (board[0][i] == board[1][i] &&
                 board[0][i] == board[2][i] &&
@@ -35,6 +37,7 @@ const GameBoard = (function () {
                 eval = board[0][i];
             };
         }
+        // Diagonals
         if ((board[0][0] == board[1][1] &&
              board[0][0] == board[2][2] &&
              board[0][0] != undefined) ||
@@ -60,7 +63,7 @@ const Game = (function (gameBoard, player1, player2) {
     const board = gameBoard;
     let turn = true;
 
-    const makeMove = function (x, y) {
+    const makeMove = (x, y) => {
         let symbol = turn ? playerTwo : playerOne;
         turn = board.putAt(y, x, symbol) ? !turn : turn;
 
