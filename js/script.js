@@ -23,27 +23,19 @@ const GameBoard = (function () {
         let eval = false;
         // Rows
         for (let i = 0; i < SIZE; i++) {
-            if (board[i][0] == board[i][1] &&
-                board[i][0] == board[i][2] &&
-                board[i][0] != undefined) {
+            if (allEqual(board[i][1], board[i][2], board[i][0]) && board[i][0] !== undefined) {
                 eval = board[i][0];
             };
         }
         // Columns
         for (let i = 0; i < SIZE; i++) {
-            if (board[0][i] == board[1][i] &&
-                board[0][i] == board[2][i] &&
-                board[0][i] != undefined) {
+            if (allEqual(board[0][i], board[1][i], board[2][i]) && board[0][i] !== undefined) {
                 eval = board[0][i];
             };
         }
         // Diagonals
-        if ((board[0][0] == board[1][1] &&
-             board[0][0] == board[2][2] &&
-             board[0][0] != undefined) ||
-            (board[0][2] == board[1][1] && 
-             board[0][2] == board[2][0] &&
-             board[0][2] != undefined)) {
+        if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[0][0] != undefined) ||
+            (allEqual(board[0][2], board[1][1], board[2][0]) && board[0][2] != undefined)) {
             eval = board[0][0];
         };
 
@@ -98,6 +90,14 @@ const Game = (function (gameBoard, player1, player2) {
         turn: getTurn(),
     }
 });
+
+function allEqual(...values) {
+    let test = values[0];
+    for (let i = 1; i < values.length; i++) {
+        if (test != values[i]) return false;
+    }
+    return true;
+}
 
 let board = GameBoard();
 let game = Game(board, 'x', 'o');
