@@ -1,4 +1,22 @@
-const GameBoard = (function () {
+"use-strict";
+
+
+function createPlayer(name, symbol) {
+    let playerName = name;
+    let playerSymbol = symbol;
+    return {name: playerName, symbol: playerSymbol};
+}
+
+function allEqual(...values) {
+    let test = values[0];
+    for (let i = 1; i < values.length; i++) {
+        if (test != values[i]) return false;
+    }
+    return true;
+}
+
+
+const gameBoard = (function () {
     const SIZE = 3;
     let board = [];
     const reset = () => {
@@ -39,8 +57,8 @@ const GameBoard = (function () {
             eval = board[1][1];
         };
 
+        // If no-one has three in a row yet, and all tiles are filled, the game is a draw
         if (!eval && board.flat().length == SIZE ** 2) {
-            console.log(board.flat().length);
             eval = 'draw';
         }
 
@@ -48,20 +66,24 @@ const GameBoard = (function () {
     }
     reset();
     return { getBoard: getBoard, putAt: putAt, checkWin: checkWin, reset: reset };
-});
-const Game = (function (gameBoard, player1, player2) {
+})();
+
+const playerOne = createPlayer('Anderson', 'o');
+const playerTwo = createPlayer('Bert', 'x');
+
+const game = ((gameBoard, player1, player2) => {
     const playerOne = player1;
     const playerTwo = player2;
     const board = gameBoard;
     let turn = true;
 
     const makeMove = (x, y) => {
-        let symbol = turn ? playerTwo : playerOne;
+        let {name, symbol} = turn ? playerOne : playerTwo;
         turn = board.putAt(y, x, symbol) ? !turn : turn;
 
         let hasWon = board.checkWin();
         if (hasWon) {
-            console.log(hasWon);
+            console.log(`${name} has won the game!`);
             board.reset();
         }
 
@@ -89,15 +111,4 @@ const Game = (function (gameBoard, player1, player2) {
         makeMove: makeMove,
         turn: getTurn(),
     }
-});
-
-function allEqual(...values) {
-    let test = values[0];
-    for (let i = 1; i < values.length; i++) {
-        if (test != values[i]) return false;
-    }
-    return true;
-}
-
-let board = GameBoard();
-let game = Game(board, 'x', 'o');
+})(gameBoard, playerOne, playerTwo);
