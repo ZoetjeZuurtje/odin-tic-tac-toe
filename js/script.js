@@ -76,20 +76,24 @@ const game = ((gameBoard, player1, player2) => {
     const playerTwo = player2;
     const board = gameBoard;
     let turn = true;
+    let finished = false;
 
     const makeMove = (x, y) => {
+        // this needs to be at the start of the function, rather than at the end,
+        // to allow the gameView class to update the DOM before the internal representation gets reset. 
+        if (finished) reset();
+
         let {name, symbol} = turn ? playerOne : playerTwo;
         turn = board.putAt(y, x, symbol) ? !turn : turn;
 
         let hasWon = board.checkWin();
         if (hasWon) {
-            console.log(`${name} has won the game!`);
-            board.reset();
+            finished = true;
+            return name;
         }
-
-        printGameInfo();
+        return false;
     }
-    const getTurn = () => turn;
+    //const getTurn = () => turn;
     // Prints board, coords, and who's to play to the console.
     const printGameInfo = () => {
         let boardState = board.getBoard();
@@ -106,9 +110,47 @@ const game = ((gameBoard, player1, player2) => {
         msg += turn ? "\nplayer 1's turn" : "\nplayer 2's turn";
         console.log(msg);
     }
+    const reset = () => {
+        board.reset();
+        turn = true;
+        finished = false;
+    }
+    const getBoard = () => {
+        return board.getBoard();
+    }
     return {
-        board: board.getBoard,
-        makeMove: makeMove,
-        turn: getTurn(),
+        reset,
+        makeMove,
+        board: getBoard,
+        info: printGameInfo
     }
 })(gameBoard, playerOne, playerTwo);
+
+const gameView = ((game, boardElement, dialog) => {
+    const displayBoard = () => {
+        let size = game.board().length;
+        let boardState = game.board();
+        for (let rowIndex = 0; rowIndex < size; rowIndex++) {
+            for (let colIndex = 0; colIndex < size; colIndex++) {
+                let cell = document.querySelector(`[data-row="${rowIndex}"][data-col="${colIndex}"]`);
+                let val = boardState[rowIndex][colIndex];
+                cell.textContent = val;
+            }
+        }
+    }
+    const clickHandler = event => {
+        let col = event.target.dataset.col;
+        let row = event.target.dataset.row;
+
+        let winner = game.makeMove(col, row);
+
+        if (winner) {
+            dialog.showModal();
+        }
+
+        displayBoard();
+    }
+
+    
+    boardElement.childNodes.forEach(element => element.addEventListener('click', clickHandler));
+})(game, document.querySelector('.board'), document.querySelector('dialog'));
