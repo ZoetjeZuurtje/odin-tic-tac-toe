@@ -34,9 +34,9 @@ const GameBoard = (function () {
             };
         }
         // Diagonals
-        if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[0][0] != undefined) ||
-            (allEqual(board[0][2], board[1][1], board[2][0]) && board[0][2] != undefined)) {
-            eval = board[0][0];
+        if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[1][1] != undefined) ||
+            (allEqual(board[0][2], board[1][1], board[2][0]) && board[1][1] != undefined)) {
+            eval = board[1][1];
         };
 
         if (!eval && board.flat().length == SIZE ** 2) {
