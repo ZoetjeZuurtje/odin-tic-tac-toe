@@ -33,37 +33,37 @@ const gameBoard = (function () {
         return false;
     }
     const getBoard = () => board;
-    // Returns false if the game is still ongoing, to prevent accidental draws from occurring
+    
+    // return `false` if the game is still ongoing,
+    // return `true`  if someone has won, 
+    // return 'draw'  if the game ended in a tie.
     const checkWin = () => {
-        // If not, check to see who won (if anyone)
-        let eval = false;
         // Rows
         for (let i = 0; i < SIZE; i++) {
             if (allEqual(board[i][1], board[i][2], board[i][0]) && board[i][0] !== undefined) {
-                eval = board[i][0];
+                return true;
             };
         }
         // Columns
         for (let i = 0; i < SIZE; i++) {
             if (allEqual(board[0][i], board[1][i], board[2][i]) && board[0][i] !== undefined) {
-                eval = board[0][i];
+                return true;
             };
         }
         // Diagonals
         if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[1][1] !== undefined) ||
             (allEqual(board[0][2], board[1][1], board[2][0]) && board[1][1] !== undefined)) {
-            eval = board[1][1];
+            return true;
         };
 
-        // If no-one has three in a row yet, and all tiles are filled, the game is a draw
-        if (!eval && board.flat().length == SIZE ** 2) {
-            eval = 'draw';
+        if (board.flat().length == SIZE ** 2) {
+            return 'draw';
         }
 
-        return eval;
+        return false;
     }
     reset();
-    
+
     return { getBoard, putAt, checkWin, reset };
 })();
 
@@ -85,10 +85,11 @@ const game = ((gameBoard, player1, player2) => {
         let { name, symbol } = turn ? playerOne : playerTwo;
         turn = board.putAt(y, x, symbol) ? !turn : turn;
 
-        let hasWon = board.checkWin();
-        if (hasWon) {
-            finished = true;
-            return {finished: true, winner: name};
+        finished = board.checkWin();
+        if (finished == 'draw') {
+            return finished;
+        } else if (finished) {
+            return `${name} won!`;
         }
         return false;
     }
@@ -131,8 +132,7 @@ const gameView = ((game, boardElement, dialog) => {
         for (let rowIndex = 0; rowIndex < size; rowIndex++) {
             for (let colIndex = 0; colIndex < size; colIndex++) {
                 let cell = document.querySelector(`[data-row="${rowIndex}"][data-col="${colIndex}"]`);
-                let val = board[rowIndex][colIndex];
-                cell.textContent = val;
+                cell.textContent = board[rowIndex][colIndex];
             }
         }
     }
@@ -140,9 +140,10 @@ const gameView = ((game, boardElement, dialog) => {
         let col = event.target.dataset.col;
         let row = event.target.dataset.row;
 
-        let board = game.makeMove(col, row);
+        let outcomeMsg = game.makeMove(col, row);
 
-        if (board.finished) {
+        if (outcomeMsg !== false) {
+            dialog.querySelector('h2').textContent = outcomeMsg;
             dialog.showModal();
         }
 
