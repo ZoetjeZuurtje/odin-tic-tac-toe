@@ -4,7 +4,7 @@
 function createPlayer(name, symbol) {
     let playerName = name;
     let playerSymbol = symbol;
-    return {name: playerName, symbol: playerSymbol};
+    return { name: playerName, symbol: playerSymbol };
 }
 
 function allEqual(...values) {
@@ -32,9 +32,7 @@ const gameBoard = (function () {
         }
         return false;
     }
-    const getBoard = () => {
-        return board;
-    }
+    const getBoard = () => board;
     // Returns false if the game is still ongoing, to prevent accidental draws from occurring
     const checkWin = () => {
         // If not, check to see who won (if anyone)
@@ -52,8 +50,8 @@ const gameBoard = (function () {
             };
         }
         // Diagonals
-        if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[1][1] != undefined) ||
-            (allEqual(board[0][2], board[1][1], board[2][0]) && board[1][1] != undefined)) {
+        if ((allEqual(board[0][0], board[1][1], board[2][2]) && board[1][1] !== undefined) ||
+            (allEqual(board[0][2], board[1][1], board[2][0]) && board[1][1] !== undefined)) {
             eval = board[1][1];
         };
 
@@ -65,7 +63,8 @@ const gameBoard = (function () {
         return eval;
     }
     reset();
-    return { getBoard: getBoard, putAt: putAt, checkWin: checkWin, reset: reset };
+    
+    return { getBoard, putAt, checkWin, reset };
 })();
 
 const playerOne = createPlayer('Anderson', 'o');
@@ -83,20 +82,20 @@ const game = ((gameBoard, player1, player2) => {
         // to allow the gameView class to update the DOM before the internal representation gets reset. 
         if (finished) reset();
 
-        let {name, symbol} = turn ? playerOne : playerTwo;
+        let { name, symbol } = turn ? playerOne : playerTwo;
         turn = board.putAt(y, x, symbol) ? !turn : turn;
 
         let hasWon = board.checkWin();
         if (hasWon) {
             finished = true;
-            return name;
+            return {finished: true, winner: name};
         }
         return false;
     }
     //const getTurn = () => turn;
     // Prints board, coords, and who's to play to the console.
     const printGameInfo = () => {
-        let boardState = board.getBoard();
+        let boardState = getBoard();
         let msg = '';
         for (let row = 0; row < boardState.length; row++) {
             msg += `${row} `;
@@ -115,25 +114,24 @@ const game = ((gameBoard, player1, player2) => {
         turn = true;
         finished = false;
     }
-    const getBoard = () => {
-        return board.getBoard();
-    }
+    const getBoard = () => board.getBoard();
+
     return {
         reset,
         makeMove,
-        board: getBoard,
+        getBoard,
         info: printGameInfo
     }
 })(gameBoard, playerOne, playerTwo);
 
 const gameView = ((game, boardElement, dialog) => {
     const displayBoard = () => {
-        let size = game.board().length;
-        let boardState = game.board();
+        let board = game.getBoard();
+        let size = board.length;
         for (let rowIndex = 0; rowIndex < size; rowIndex++) {
             for (let colIndex = 0; colIndex < size; colIndex++) {
                 let cell = document.querySelector(`[data-row="${rowIndex}"][data-col="${colIndex}"]`);
-                let val = boardState[rowIndex][colIndex];
+                let val = board[rowIndex][colIndex];
                 cell.textContent = val;
             }
         }
@@ -142,15 +140,15 @@ const gameView = ((game, boardElement, dialog) => {
         let col = event.target.dataset.col;
         let row = event.target.dataset.row;
 
-        let winner = game.makeMove(col, row);
+        let board = game.makeMove(col, row);
 
-        if (winner) {
+        if (board.finished) {
             dialog.showModal();
         }
 
         displayBoard();
     }
 
-    
+
     boardElement.childNodes.forEach(element => element.addEventListener('click', clickHandler));
 })(game, document.querySelector('.board'), document.querySelector('dialog'));
