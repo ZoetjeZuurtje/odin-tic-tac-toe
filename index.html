@@ -14,13 +14,16 @@
 <body>
     <dialog>
         <h2></h2>
-        <button type="submit">Play Again</button>
+        <form method="dialog">
+            <button autofocus>Play Again</button>
+        </form>
     </dialog>
+      
     <main>
         <div class="game">
             <div class="player">
-                <h2>Arnold</h2>
-                <button class="edit-name material-symbols-outlined">edit</button>
+                <button class="edit-name material-symbols-outlined" data-player="playerOne">edit</button>
+                <input type="text" value="Player One" disabled data-player="playerOne">
             </div>
             <div class="board">
                 <div data-row="0" data-col="0"></div>
@@ -32,10 +35,11 @@
                 <div data-row="2" data-col="0"></div>
                 <div data-row="2" data-col="1"></div>
                 <div data-row="2" data-col="2"></div>
+                <button id="resetbutton">Reset</button>
             </div>
             <div class="player">
-                <h2>Bart</h2>
-                <button class="edit-name material-symbols-outlined">edit</button>
+                <button class="edit-name material-symbols-outlined" data-player="playerTwo">edit</button>
+                <input type="text" value="Player Two" disabled data-player="playerOne">
             </div>
         </div>
     </main>

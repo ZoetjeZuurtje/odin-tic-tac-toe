@@ -1,11 +1,9 @@
 "use-strict";
 
 
-function createPlayer(name, symbol) {
-    let playerName = name;
-    let playerSymbol = symbol;
-    return { name: playerName, symbol: playerSymbol };
-}
+const createPlayer = (name, symbol) => { 
+    return {name, symbol};
+};
 
 function allEqual(...values) {
     let test = values[0];
@@ -33,7 +31,7 @@ const gameBoard = (function () {
         return false;
     }
     const getBoard = () => board;
-    
+
     // return `false` if the game is still ongoing,
     // return `true`  if someone has won, 
     // return 'draw'  if the game ended in a tie.
@@ -67,8 +65,8 @@ const gameBoard = (function () {
     return { getBoard, putAt, checkWin, reset };
 })();
 
-const playerOne = createPlayer('Anderson', 'o');
-const playerTwo = createPlayer('Bert', 'x');
+const playerOne = createPlayer('Player One', 'o');
+const playerTwo = createPlayer('Player Two', 'x');
 
 const game = ((gameBoard, player1, player2) => {
     const playerOne = player1;
@@ -121,7 +119,9 @@ const game = ((gameBoard, player1, player2) => {
         reset,
         makeMove,
         getBoard,
-        info: printGameInfo
+        info: printGameInfo,
+        playerOne,
+        playerTwo
     }
 })(gameBoard, playerOne, playerTwo);
 
@@ -149,7 +149,47 @@ const gameView = ((game, boardElement, dialog) => {
 
         displayBoard();
     }
+    const editName = event => {
+        let player = event.target.dataset.player;
+        let inputElement = document.querySelector(`.edit-name[data-player="${player}"] + input`);
+        
+        if (inputElement.hasAttribute('disabled')) {
+            inputElement.removeAttribute('disabled');
+            inputElement.select();
+        } else {
+            inputElement.setAttribute('disabled', true);
+            game[`${player}`].name = inputElement.value;
+        }
+    }
+    const reset = () => {
+        game.reset();
+        displayBoard();
+    }
 
+    const init = () => {
+        boardElement.querySelectorAll('div').forEach(element => {
+            element.addEventListener('click', clickHandler)
+        });
 
-    boardElement.childNodes.forEach(element => element.addEventListener('click', clickHandler));
+        const editNameBtns = document.querySelectorAll('.edit-name');
+        editNameBtns.forEach(btn => {
+            btn.addEventListener('click', editName);
+        });
+
+        const playerNames = document.querySelectorAll('.player input');
+        playerNames.forEach(element => element.addEventListener('keydown', e => {
+            if (e.key == 'Enter') {
+                let inputElement = e.target;
+                let player = e.target.dataset.player;
+
+                inputElement.setAttribute('disabled', true);
+                game[`${player}`].name = inputElement.value;
+            }
+        }));
+
+        document.querySelector('#resetbutton').addEventListener('click', reset);
+    }
+
+    init();
+
 })(game, document.querySelector('.board'), document.querySelector('dialog'));

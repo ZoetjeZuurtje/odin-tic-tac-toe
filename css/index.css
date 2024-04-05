@@ -33,6 +33,16 @@
     align-items: center;
 }
 
+.player input {
+    font-size: 2rem;
+    width: 10rem;
+
+    &[disabled] {
+        border: none;
+        color: black;
+    }
+}
+
 .edit-name {
     --size: 35px;
     height: var(--size);
@@ -43,6 +53,7 @@
 
     position: relative;
     bottom: 10px;
+    left: 10px;
     
 }
 button {
@@ -67,4 +78,13 @@ dialog {
         width: 100px;
         height: 50px;
     }
+}
+
+#resetbutton {
+    grid-column: 1 / 4;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    line-height: 24px;
 }
